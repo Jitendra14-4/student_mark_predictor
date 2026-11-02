@@ -1,0 +1,573 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Marks Prediction System</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+body {
+    background: #f3f6fc;
+    color: #1e293b;
+}
+
+/* LOGIN */
+
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg,#101d40,#2455a4);
+    padding: 20px;
+}
+
+.login-box {
+    width: 380px;
+    background: white;
+    padding: 35px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 15px 50px #0003;
+}
+
+.login-box h2 {
+    margin-bottom: 10px;
+    color: #173b78;
+}
+
+.login-box p {
+    color: #64748b;
+    margin-bottom: 25px;
+}
+
+input, button {
+    width: 100%;
+    padding: 13px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #dce3ed;
+    font-size: 15px;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #1749b8;
+}
+
+.login-error {
+    color: red;
+    font-size: 13px;
+}
+
+/* DASHBOARD */
+
+.dashboard {
+    display: none;
+}
+
+.sidebar {
+    position: fixed;
+    width: 245px;
+    height: 100vh;
+    background: #14264b;
+    color: white;
+    padding: 25px 15px;
+}
+
+.logo {
+    font-size: 21px;
+    font-weight: bold;
+    padding: 10px;
+    margin-bottom: 35px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 14px;
+    margin: 8px 0;
+    color: #dce6ff;
+    text-decoration: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.sidebar a:hover {
+    background: #294b83;
+}
+
+.main {
+    margin-left: 245px;
+    padding: 30px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 15px;
+}
+
+.topbar h2 {
+    color: #172b50;
+}
+
+.logout {
+    width: auto;
+    padding: 10px 20px;
+    background: #ef4444;
+}
+
+/* STAT CARDS */
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 13px;
+    box-shadow: 0 3px 15px #00000008;
+}
+
+.card p {
+    color: #64748b;
+    margin-bottom: 12px;
+}
+
+.card h2 {
+    font-size: 30px;
+}
+
+.blue { border-left: 5px solid #2563eb; }
+.green { border-left: 5px solid #16a34a; }
+.red { border-left: 5px solid #ef4444; }
+
+/* SECTIONS */
+
+.section {
+    background: white;
+    padding: 25px;
+    border-radius: 13px;
+    margin-bottom: 25px;
+    box-shadow: 0 3px 15px #00000008;
+}
+
+.section h3 {
+    margin-bottom: 20px;
+    color: #172b50;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 500px;
+}
+
+th, td {
+    padding: 14px;
+    text-align: left;
+    border-bottom: 1px solid #e5eaf2;
+}
+
+th {
+    background: #f5f7fb;
+    color: #475569;
+}
+
+.pass {
+    color: #16a34a;
+    font-weight: bold;
+}
+
+.fail {
+    color: #dc2626;
+    font-weight: bold;
+}
+
+/* PREDICTOR */
+
+.predictor {
+    max-width: 550px;
+}
+
+.predictor input {
+    margin-top: 8px;
+}
+
+.result-box {
+    padding: 20px;
+    margin-top: 15px;
+    background: #eff6ff;
+    border-radius: 10px;
+    display: none;
+    line-height: 2;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:800px) {
+    .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+    }
+
+    .logo {
+        margin-bottom: 10px;
+    }
+
+    .main {
+        margin-left: 0;
+        padding: 15px;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+    .topbar {
+        align-items: flex-start;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN PAGE -->
+
+<div class="login-page" id="loginPage">
+
+    <div class="login-box">
+        <h2>🎓 Student Portal</h2>
+        <p>Student Marks Prediction System</p>
+
+        <form onsubmit="login(event)">
+            <input type="text" id="username"
+                   placeholder="Student Username" required>
+
+            <input type="password" id="password"
+                   placeholder="Password" required>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="login-error" id="loginError"></div>
+
+        <small>Demo Login: student / 12345</small>
+    </div>
+
+</div>
+
+
+<!-- DASHBOARD -->
+
+<div class="dashboard" id="dashboard">
+
+    <div class="sidebar">
+
+        <div class="logo">🎓 StudentPro</div>
+
+        <a href="#overview">🏠 Dashboard</a>
+        <a href="#students">👨‍🎓 Students</a>
+        <a href="#predictor">📊 Marks Predictor</a>
+        <a href="#results">📋 Results</a>
+
+    </div>
+
+
+    <div class="main">
+
+        <div class="topbar">
+            <div>
+                <h2>Student Dashboard</h2>
+                <p>Welcome back, <span id="studentName">Student</span>!</p>
+            </div>
+
+            <button class="logout" onclick="logout()">Logout</button>
+        </div>
+
+
+        <!-- OVERVIEW -->
+
+        <div id="overview">
+
+            <div class="cards">
+
+                <div class="card blue">
+                    <p>Total Students</p>
+                    <h2 id="total">5</h2>
+                </div>
+
+                <div class="card green">
+                    <p>Students Passed</p>
+                    <h2 id="passed">4</h2>
+                </div>
+
+                <div class="card red">
+                    <p>Students Failed</p>
+                    <h2 id="failed">1</h2>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- STUDENT TABLE -->
+
+        <div class="section" id="students">
+
+            <h3>👨‍🎓 Student Marks Details</h3>
+
+            <input type="text" id="search"
+                   placeholder="Search student name..."
+                   oninput="searchStudents()">
+
+            <div class="table-container">
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Maths</th>
+                            <th>Science</th>
+                            <th>English</th>
+                            <th>Total</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="studentTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- MARKS PREDICTOR -->
+
+        <div class="section" id="predictor">
+
+            <h3>📊 Student Marks Predictor</h3>
+
+            <div class="predictor">
+
+                <label>Student Name</label>
+                <input type="text" id="predictName"
+                       placeholder="Enter student name">
+
+                <label>Study Hours Per Day</label>
+                <input type="number" id="hours"
+                       placeholder="Enter study hours"
+                       min="0" max="24" step="0.1">
+
+                <label>Previous Marks (Out of 100)</label>
+                <input type="number" id="previous"
+                       placeholder="Enter previous marks"
+                       min="0" max="100">
+
+                <button onclick="predictMarks()">
+                    Predict Student Marks
+                </button>
+
+                <div class="result-box" id="predictionResult"></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- RESULTS -->
+
+        <div class="section" id="results">
+
+            <h3>📋 Examination Results</h3>
+
+            <p>
+                Passing Marks: <b>35 / 100</b>
+            </p>
+
+            <p style="margin-top:10px;color:#64748b">
+                Students scoring 35 or above are marked PASS.
+                Students scoring below 35 are marked FAIL.
+            </p>
+
+        </div>
+
+        <p style="text-align:center;color:#94a3b8;padding:15px">
+            © 2026 Student Marks Prediction System
+        </p>
+
+    </div>
+
+</div>
+
+
+<script>
+
+// DEMO LOGIN
+
+function login(event) {
+    event.preventDefault();
+
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+
+    if(username === "student" && password === "12345") {
+
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+
+        document.getElementById("studentName").innerText = username;
+
+        renderStudents();
+
+    } else {
+
+        document.getElementById("loginError").innerText =
+        "Invalid username or password!";
+
+    }
+}
+
+function logout() {
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("loginPage").style.display = "flex";
+}
+
+
+// DEMO STUDENT DATA
+
+let students = [
+    {id:101,name:"Rahul",maths:85,science:78,english:90},
+    {id:102,name:"Priya",maths:92,science:88,english:95},
+    {id:103,name:"Amit",maths:25,science:30,english:28},
+    {id:104,name:"Sneha",maths:75,science:80,english:70},
+    {id:105,name:"Rohan",maths:65,science:72,english:68}
+];
+
+function getResult(total) {
+    return total / 3 >= 35 ? "PASS" : "FAIL";
+}
+
+function renderStudents(data = students) {
+
+    let table = document.getElementById("studentTable");
+
+    table.innerHTML = "";
+
+    data.forEach(student => {
+
+        let total = student.maths + student.science + student.english;
+        let average = total / 3;
+        let result = getResult(total);
+
+        table.innerHTML += `
+            <tr>
+                <td>${student.id}</td>
+                <td>${student.name}</td>
+                <td>${student.maths}</td>
+                <td>${student.science}</td>
+                <td>${student.english}</td>
+                <td>${average.toFixed(2)}%</td>
+                <td class="${result === 'PASS' ? 'pass' : 'fail'}">
+                    ${result}
+                </td>
+            </tr>
+        `;
+    });
+
+    document.getElementById("total").innerText = students.length;
+
+    document.getElementById("passed").innerText =
+        students.filter(s => getResult(s.maths+s.science+s.english) === "PASS").length;
+
+    document.getElementById("failed").innerText =
+        students.filter(s => getResult(s.maths+s.science+s.english) === "FAIL").length;
+}
+
+
+// SEARCH
+
+function searchStudents() {
+
+    let search = document.getElementById("search").value.toLowerCase();
+
+    let filtered = students.filter(student =>
+        student.name.toLowerCase().includes(search)
+    );
+
+    renderStudents(filtered);
+}
+
+
+// DEMO PREDICTION
+
+function predictMarks() {
+
+    let name = document.getElementById("predictName").value;
+    let hours = Number(document.getElementById("hours").value);
+    let previous = Number(document.getElementById("previous").value);
+
+    if(!name.trim() || hours < 0 || hours > 24 ||
+       document.getElementById("hours").value === "" ||
+       document.getElementById("previous").value === "" ||
+       previous < 0 || previous > 100) {
+
+        alert("Please enter valid student details.");
+        return;
+    }
+
+    // DEMO ESTIMATION ONLY - NOT A TRAINED ML MODEL
+    let prediction = (hours * 3) + (previous * 0.7);
+
+    prediction = Math.min(100, Math.max(0, prediction));
+
+    let status = prediction >= 35 ? "PASS" : "FAIL";
+
+    let result = document.getElementById("predictionResult");
+
+    result.style.display = "block";
+
+    result.innerHTML = `
+        <h3>Prediction Result</h3>
+        Student: <b>${name.replace(/[&<>"']/g, "")}</b><br>
+        Predicted Marks: <b>${prediction.toFixed(2)} / 100</b><br>
+        Result: <b class="${status === 'PASS' ? 'pass' : 'fail'}">
+        ${status}</b>
+    `;
+}
+
+</script>
+
+</body>
+</html>
